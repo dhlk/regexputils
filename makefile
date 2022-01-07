@@ -13,4 +13,4 @@ clean:
 	rm -f $(TARGETS)
 
 $(TARGETS): %: %.go
-	go build -o $@ $<
+	go build -trimpath -o $@ $<
