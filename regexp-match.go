@@ -56,8 +56,8 @@ func main() {
 	matchFound := false
 	for i, input := range inputs {
 		r := bufio.NewReader(input)
-		for line, err := r.ReadBytes(delim); err == nil || err == io.EOF; line, err = r.ReadBytes(delim) {
-			if exp.Match(line) {
+		for line, err := r.ReadBytes(delim); err == nil; line, err = r.ReadBytes(delim) {
+			if exp.Match(line[:len(line)-1]) {
 				matchFound = true
 				if *quiet {
 					os.Exit(0)
