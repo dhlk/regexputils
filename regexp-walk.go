@@ -9,6 +9,8 @@ import (
 	"regexp"
 )
 
+var delim = '\n'
+
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: %s regexp [regexp...] [: path [path...]]\n", os.Args[0])
@@ -17,12 +19,17 @@ func main() {
 	dirs := flag.Bool("dirs", false, "only check directories")
 	files := flag.Bool("files", false, "only check files")
 	union := flag.Bool("union", false, "take the union of the provided expressions instead of the intersection")
+	null := flag.Bool("0", false, "use a null character as a record delimiter (instead of newline)")
 	flag.Parse()
 	args := flag.Args()
 
 	if len(args) == 0 {
 		flag.Usage()
 		os.Exit(1)
+	}
+
+	if *null {
+		delim = '\000'
 	}
 
 	var exps []*regexp.Regexp
@@ -79,7 +86,7 @@ func main() {
 					}
 				}
 				if match {
-					fmt.Println(path)
+					fmt.Printf("%s%c", path, delim)
 				}
 			}
 

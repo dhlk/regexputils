@@ -9,6 +9,8 @@ import (
 	"regexp"
 )
 
+var delim byte = '\n'
+
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: %s [option...] regexp [file...]\n", os.Args[0])
@@ -17,12 +19,17 @@ func main() {
 	lines := flag.Bool("lines", false, "print only matching lines")
 	paths := flag.Bool("paths", false, "print only matching paths")
 	quiet := flag.Bool("quiet", false, "exit after finding a match")
+	null := flag.Bool("0", false, "use a null character as a record delimiter (instead of newline)")
 	flag.Parse()
 	args := flag.Args()
 
 	if len(args) == 0 {
 		flag.Usage()
 		os.Exit(1)
+	}
+
+	if *null {
+		delim = '\000'
 	}
 
 	exp, err := regexp.Compile(args[0])
@@ -49,7 +56,7 @@ func main() {
 	matchFound := false
 	for i, input := range inputs {
 		r := bufio.NewReader(input)
-		for line, err := r.ReadBytes('\n'); err == nil || err == io.EOF; line, err = r.ReadBytes('\n') {
+		for line, err := r.ReadBytes(delim); err == nil || err == io.EOF; line, err = r.ReadBytes(delim) {
 			if exp.Match(line) {
 				matchFound = true
 				if *quiet {
